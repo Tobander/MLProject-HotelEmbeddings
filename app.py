@@ -13,11 +13,26 @@ client = OpenAI(api_key=API_KEY)
 
 # SYSTEM MESSAGE
 system_message = """
-You are an AI assistant that recommends family hotels based only on the provided hotel information.
-If the provided hotel information does not cover the user's query, respond with: 'I don’t have enough information to answer this question.'
-Only use the provided context and do not invent details.
-Be concise, friendly, and helpful in your recommendations.
-Anser in GERMAN.
+You are an AI assistant recommending family hotels based only on the provided hotel information.  
+Your task is to help the user find the most suitable hotel based on their query.  
+
+Instructions:
+- Use only the information from the hotel data (context) provided below.  
+- If the hotel matches the request fully or partially, explain clearly why this hotel could be a good fit.  
+- If the hotel only partially fits (e.g., not the exact location or not 5 stars), point this out but still present it as a potential option if it has other strengths.  
+- If key information (like star rating or wellness facilities) is missing, state that transparently.  
+- Always structure your answer in a friendly, clear, and helpful way.  
+- Start with a summary sentence (e.g., "I recommend the following hotel for your request:").  
+- Then present the details in bullet points:  
+   - Location  
+   - Star rating (if available)  
+   - Wellness and Spa offers  
+   - Family activities  
+   - Nearby attractions  
+   - Price range  
+- Finish with a short conclusion explaining whether the hotel is a perfect fit or a close alternative.  
+- If no fit is possible, say: "I couldn’t find a perfect match, but here is the closest option I found."
+- Answer in GERMAN.
 """
 
 # -----------------UTILITY FUNCTIONS -----------------
@@ -71,19 +86,26 @@ if st.button("Suche starten"):
                     f"Nearby Attractions: {best_article.get('Nearby Attractions', 'N/A')}\n\n"
                     f"Beschreibung: {best_article.get('Short Description', 'N/A')}\n\n"
                     f"Preisklasse: {best_article.get('Preisklasse', 'N/A')}\n"
+                    f"Sterne: {best_article.get('Stern', 'N/A')}\n"
                 )
 
                 prompt = (
-                    f"You are an AI assistant recommending hotels based on the provided hotel data.\n\n"
-                    f"Context:\n{context}\n\n"
-                    f"User Query: {user_query}\n\n"
-                    f"Instructions:\n"
-                    f"- Use only the information from the context to answer.\n"
-                    f"- If the context is insufficient, answer: 'I don’t have enough information to answer this question.'\n"
-                    f"- Be clear, concise, and friendly.\n"
-                    f"- Highlight why this hotel could be a good fit.\n\n"
-                    f"Recommendation:"
-                )
+                    f"Du bist ein KI-Assistent, der basierend auf den unten stehenden Hoteldaten passende Hotels empfiehlt.\n\n"
+                    f"Context (Hoteldaten):\n{context}\n\n"
+                    f"Benutzeranfrage: {user_query}\n\n"
+                    f"Anweisungen:\n"
+                    f"- Nutze ausschließlich die Informationen aus dem gegebenen Kontext.\n"
+                    f"- Wenn das Hotel vollständig oder teilweise zur Anfrage passt, erkläre freundlich und klar, warum.\n"
+                    f"- Wenn es nur teilweise passt (z.B. andere Region, keine Angabe zu Sternen), erwähne das transparent und erkläre, warum es dennoch eine gute Option sein könnte.\n"
+                    f"- Fehlen wichtige Informationen, weise darauf hin.\n"
+                    f"- Strukturiere deine Antwort in kurzen Abschnitten oder Bulletpoints.\n"
+                    f"- Beginne mit einem Satz wie: 'Ich empfehle folgendes Hotel basierend auf deiner Anfrage:'\n"
+                    f"- Liste dann Details in Stichpunkten auf (Lage, Sterne, Wellness, Familienaktivitäten, Sehenswürdigkeiten, Preisklasse).\n"
+                    f"- Beende die Antwort mit einem kurzen Fazit, ob es eine perfekte Übereinstimmung oder eine gute Alternative ist.\n"
+                    f"- Antworte bitte vollständig auf Deutsch.\n\n"
+                    f"Empfehlung:"
+                    )
+
 
                 response = client.chat.completions.create(
                     model=CHATBOT_MODEL,
